@@ -19,6 +19,7 @@
   :serial T
   :components ((:file "package")
                (:file "package-toolkit")
+               (:file "hooks")
                (:file "module")
                (:file "asdf"))
   :depends-on ())
