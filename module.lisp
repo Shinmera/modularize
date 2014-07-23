@@ -102,7 +102,8 @@
     (delete-package module)
     identifier))
 
-(defmacro do-modules ((var &optional result-form) &body body)
-  `(loop for ,var being the hash-keys of *module-storages*
-         do (progn ,@body)
-         finally (return ,result-form)))
+(defun map-modules (function)
+  (maphash #'(lambda (key module)
+               (declare (ignore key))
+               (funcall function module))
+           *module-storages*))

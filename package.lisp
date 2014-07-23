@@ -39,4 +39,4 @@
    #:modularize
    #:demodularize
    #:delete-module
-   #:do-modules))
+   #:map-modules))
