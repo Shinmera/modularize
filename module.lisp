@@ -55,12 +55,14 @@
   (module))
 
 (defmacro define-module (name &body options)
-  (let ((name (string name)))
+  (let ((name (string name))
+        (package (gensym "PACKAGE")))
     `(eval-when (:compile-toplevel :load-toplevel :execute)
        (defpackage ,(make-symbol name)
          ,@options)
-       (modularize :package (find-package ,name)
-                   :name ,name))))
+       (let ((,package (find-package ,name)))
+         (modularize :package ,package :name ,name)
+         (call-setup-hooks ,package)))))
 
 (defmacro define-module-extension ((module name) &body options)
   (let ((module (module module))
@@ -92,17 +94,10 @@
   (remhash (module module) *module-storages*)
   module)
 
-(defgeneric module-cleanup (package)
-  (:documentation ""))
-
-(defmethod module-cleanup ((package package))
-  "Default no-op method."
-  NIL)
-
-(defun remove-module (module)
+(defun delete-module (module)
   (let* ((module (module module))
          (identifier (module-identifier module)))
-    (module-cleanup module)
+    (call-delete-hooks module)
     (demodularize module)
     (delete-package module)
     identifier))

@@ -7,6 +7,24 @@
 (defpackage org.tymoonnext.radiance.lib.modularize
   (:use #:cl)
   (:nicknames #:modularize #:radiance-modularize)
+  ;; asdf.lisp
+  (:export
+   #:module
+   #:virtual-module-name
+   #:virtual-module
+   #:virtual-module-not-found
+   #:register-virtual-module
+   #:load-module)
+  ;; hooks.lisp
+  (:export
+   #:setup-hook
+   #:remove-setup-hook
+   #:call-setup-hooks
+   #:define-setup-hook
+   #:delete-hook
+   #:remove-delete-hook
+   #:call-delete-hooks
+   #:define-delete-hook)
   ;; module.lisp
   (:export
    #:module
@@ -20,14 +38,5 @@
    #:define-module-extension
    #:modularize
    #:demodularize
-   #:module-cleanup
-   #:remove-module
-   #:do-modules)
-  ;; asdf.lisp
-  (:export
-   #:module
-   #:virtual-module-name
-   #:virtual-module
-   #:virtual-module-not-found
-   #:register-virtual-module
-   #:load-module))
+   #:delete-module
+   #:do-modules))
