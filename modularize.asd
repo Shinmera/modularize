@@ -21,4 +21,4 @@
                (:file "package-toolkit")
                (:file "module")
                (:file "asdf"))
-  :depends-on (:trivial-indent))
+  :depends-on ())
