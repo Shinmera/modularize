@@ -45,3 +45,12 @@
               (loop for symbol in args do (intern (symbol-name symbol) package)))
              (:size
               (error "SIZE option not applicable to EXTEND-PACKAGE.")))))
+
+(defun unbind-and-delete-package (package)
+  (do-symbols (symbol package)
+    (when (eql (symbol-package symbol) package)
+      (when (fboundp symbol)
+        (fmakunbound symbol))
+      (when (boundp symbol)
+        (makunbound symbol))))
+  (delete-package package))

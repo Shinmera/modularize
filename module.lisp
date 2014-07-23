@@ -62,7 +62,8 @@
          ,@options)
        (let ((,package (find-package ,name)))
          (modularize :package ,package :name ,name)
-         (call-setup-hooks ,package)))))
+         (call-setup-hooks ,package)
+         ,package))))
 
 (defmacro define-module-extension ((module name) &body options)
   (let ((module (module module))
@@ -76,8 +77,7 @@
                                  ,(make-symbol (make-identifier name)))))))
 
 (defun modularize (&key (package *package*) (name (package-name package)))
-  (let ((table (make-hash-table :test 'eql))
-        (identifier (make-identifier name)))
+  (let ((identifier (make-identifier name)))
     ;; Push the identifier onto the nicks list
     (let ((ident-package (find-package identifier)))
       (if ident-package
@@ -85,9 +85,10 @@
             (error "Cannot modularize: ~a is a taken name by ~a." identifier ident-package))
           (add-package-nickname package identifier)))
     ;; Register on the storage
-    (setf (gethash :identifier table) identifier
-          (gethash :name table) name
-          (gethash package *module-storages*) table)
+    (unless (module-p package)
+      (setf (gethash package *module-storages*) (make-hash-table :test 'eql)))
+    (setf (module-storage package :identifier) identifier
+          (module-storage package :name) name)
     package))
 
 (defun demodularize (module)
@@ -99,7 +100,7 @@
          (identifier (module-identifier module)))
     (call-delete-hooks module)
     (demodularize module)
-    (delete-package module)
+    (unbind-and-delete-package module)
     identifier))
 
 (defun map-modules (function)
