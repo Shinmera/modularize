@@ -54,18 +54,33 @@
 (defmacro current-module ()
   (module))
 
+(defgeneric expand-option (type package args))
+
+(defmacro define-option-expander (name (package &rest arguments) &body body)
+  (let ((args (gensym "ARGS")))
+    `(defmethod expand-option ((,(gensym "TYPE") (eql ,(intern (string name) "KEYWORD"))) ,package ,args)
+       (destructuring-bind ,arguments ,args
+         ,@body))))
+
+(defmacro expand-module (name &rest options)
+  (let ((package (find-package name)))
+    (unless package
+      (error "Cannot expand options for ~s: No such package." name))
+    `(progn
+       ,@(loop for (type . args) in options
+               collect (expand-option type package args)))))
+
 (defmacro define-module (name &body options)
   (let ((name (string name)))
     `(eval-when (:compile-toplevel :load-toplevel :execute)
-       (defpackage ,(make-symbol name)
-         ,@options)
+       (defpackage ,(make-symbol name))
+       (expand-module ,name ,@options)
        (modularize :package (find-package ,name) :name ,name))))
 
 (defmacro define-module-extension ((module name) &body options)
   (let ((module (module module))
         (name (string name)))
     `(eval-when (:compile-toplevel :load-toplevel :execute)
-       (extend-package ,module ',options)
        (pushnew ,name (module-storage ,module :extensions) :test #'string=)
        (pushnew ,(make-identifier name) (module-storage ,module :extensions) :test #'string=)
        ;; Add nicknames so the extension can be IN-PACKAGEd as if it
@@ -73,6 +88,7 @@
        (extend-package ,module '((:nicknames
                                   ,(make-symbol name)
                                   ,(make-symbol (make-identifier name)))))
+       (expand-module ,name ,@options)
        ,module)))
 
 (defun modularize (&key (package *package*) (name (package-name package)))

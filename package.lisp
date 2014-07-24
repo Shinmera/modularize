@@ -34,6 +34,8 @@
    #:module-identifier
    #:module-name
    #:current-module
+   #:define-option-expander
+   #:expand-option
    #:define-module
    #:define-module-extension
    #:modularize
