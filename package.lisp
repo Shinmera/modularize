@@ -27,6 +27,7 @@
    #:define-delete-hook)
   ;; module.lisp
   (:export
+   #:module-not-found
    #:module
    #:module-p
    #:module-storage

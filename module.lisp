@@ -8,6 +8,10 @@
 
 (defvar *module-storages* (make-hash-table :test 'eql))
 
+(define-condition module-not-found (error)
+  ((%requested :initarg :requested :initform (error "REQUESTED required.") :reader requested))
+  (:report (lambda (c s) (format s "Module ~s requested but not found." (requested c)))))
+
 (defun extract-name (identifier)
   (subseq identifier (1+ (position #\. identifier :from-end T))))
 
@@ -23,7 +27,7 @@
             (package identifier))))
     (if (and package (module-p package))
         package
-        (error "No module found."))))
+        (error 'module-not-found :requested identifier))))
 
 (defun module-p (object)
   (etypecase object
