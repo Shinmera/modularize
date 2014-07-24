@@ -77,7 +77,12 @@
 (defmacro define-module (name &body options)
   (let ((name (string name)))
     `(eval-when (:compile-toplevel :load-toplevel :execute)
-       (defpackage ,(make-symbol name))
+       (defpackage ,(make-symbol name)
+         ,@(let ((package (find-package name)))
+             (when package
+               `((:export ,@(let ((list ()))
+                              (do-external-symbols (symbol package list)
+                                (push symbol list))))))))
        (modularize :package (find-package ,name) :name ,name)
        (expand-module ,name ,@options))))
 
