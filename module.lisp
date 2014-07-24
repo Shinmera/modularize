@@ -97,13 +97,14 @@
 
 (defun delete-module (module)
   (let* ((package (module module))
-         (identifier (module-identifier module)))
-    (when (and (stringp module) (find module (module-storage package :extensions) :test #'string=))
+         (identifier (module-identifier module))
+         (extensions (module-storage package :extensions)))
+    (when (and (stringp module) (find module extensions :test #'string=))
       (error "Cannot delete a module extension! Please delete the proper module ~a instead." (module-identifier package)))
     (call-delete-hooks package)
     (demodularize package)
     (unbind-and-delete-package package)
-    identifier))
+    (values identifier extensions)))
 
 (defun map-modules (function)
   (maphash #'(lambda (key module)
