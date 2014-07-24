@@ -55,15 +55,11 @@
   (module))
 
 (defmacro define-module (name &body options)
-  (let ((name (string name))
-        (package (gensym "PACKAGE")))
+  (let ((name (string name)))
     `(eval-when (:compile-toplevel :load-toplevel :execute)
        (defpackage ,(make-symbol name)
          ,@options)
-       (let ((,package (find-package ,name)))
-         (modularize :package ,package :name ,name)
-         (call-setup-hooks ,package)
-         ,package))))
+       (modularize :package (find-package ,name) :name ,name))))
 
 (defmacro define-module-extension ((module name) &body options)
   (let ((module (module module))
@@ -92,6 +88,7 @@
       (setf (gethash package *module-storages*) (make-hash-table :test 'eql)))
     (setf (module-storage package :identifier) identifier
           (module-storage package :name) name)
+    (call-setup-hooks package)
     package))
 
 (defun demodularize (module)
