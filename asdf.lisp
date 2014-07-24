@@ -39,6 +39,10 @@
   (or (virtual-module (first args))
       (error 'virtual-module-not-found :requested (first args))))
 
+(defmethod asdf:operate :around ((op asdf:load-op) (module module) &key)
+  (let ((*package* (find-package "MODULARIZE-USER")))
+    (call-next-method)))
+
 (defun load-module (identifier)
   (asdf:load-system (or (virtual-module identifier)
                         (error 'virtual-module-not-found :requested identifier))))

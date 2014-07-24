@@ -41,3 +41,6 @@
    #:delete-module
    #:map-modules))
 
+(defpackage org.tymoonnext.radiance.lib.modularize.user
+  (:use #:cl #:modularize)
+  (:nicknames #:modularize-user))
