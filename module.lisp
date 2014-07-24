@@ -78,8 +78,8 @@
   (let ((name (string name)))
     `(eval-when (:compile-toplevel :load-toplevel :execute)
        (defpackage ,(make-symbol name))
-       (expand-module ,name ,@options)
-       (modularize :package (find-package ,name) :name ,name))))
+       (modularize :package (find-package ,name) :name ,name)
+       (expand-module ,name ,@options))))
 
 (defmacro define-module-extension ((module name) &body options)
   (let ((module (module module))
