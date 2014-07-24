@@ -9,7 +9,7 @@
 (define-option-expander nicknames (package &rest nicknames)
   `(progn
      ,@(loop for nick in nicknames
-             collect `(add-package-nickname ,package ,nick))))
+             collect `(add-package-nickname ,package ',nick))))
 
 (define-option-expander documentation (package documentation)
   `(setf (documentation ,package T)
