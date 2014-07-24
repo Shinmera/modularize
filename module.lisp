@@ -17,10 +17,10 @@
 (defun module (&optional identifier)
   (let ((package
           (etypecase identifier
+            (null *package*)
             (string (find-package identifier))
             (symbol (find-package identifier))
-            (package identifier)
-            (null *package*))))
+            (package identifier))))
     (if (and package (module-p package))
         package
         (error "No module found."))))
@@ -70,11 +70,14 @@
         (name (string name)))
     `(eval-when (:compile-toplevel :load-toplevel :execute)
        (extend-package ,module ',options)
+       (pushnew ,name (module-storage ,module :extensions) :test #'string=)
+       (pushnew ,(make-identifier name) (module-storage ,module :extensions) :test #'string=)
        ;; Add nicknames so the extension can be IN-PACKAGEd as if it
        ;; were a proper module.
-       (extend-package ,module '(:nicknames
-                                 ,(make-symbol name)
-                                 ,(make-symbol (make-identifier name)))))))
+       (extend-package ,module '((:nicknames
+                                  ,(make-symbol name)
+                                  ,(make-symbol (make-identifier name)))))
+       ,module)))
 
 (defun modularize (&key (package *package*) (name (package-name package)))
   (let ((identifier (make-identifier name)))
@@ -96,11 +99,13 @@
   module)
 
 (defun delete-module (module)
-  (let* ((module (module module))
+  (let* ((package (module module))
          (identifier (module-identifier module)))
-    (call-delete-hooks module)
-    (demodularize module)
-    (unbind-and-delete-package module)
+    (when (and (stringp module) (find module (module-storage package :extensions) :test #'string=))
+      (error "Cannot delete a module extension! Please delete the proper module ~a instead." (module-identifier package)))
+    (call-delete-hooks package)
+    (demodularize package)
+    (unbind-and-delete-package package)
     identifier))
 
 (defun map-modules (function)
