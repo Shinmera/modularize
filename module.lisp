@@ -88,7 +88,7 @@
       (setf (gethash package *module-storages*) (make-hash-table :test 'eql)))
     (setf (module-storage package :identifier) identifier
           (module-storage package :name) name)
-    (call-setup-hooks package)
+    (call-modularize-hooks package)
     package))
 
 (defun demodularize (module)

@@ -6,25 +6,25 @@
 
 (in-package #:org.tymoonnext.radiance.lib.modularize)
 
-(defvar *setup-hooks* (make-hash-table :test 'eql))
+(defvar *modularize-hooks* (make-hash-table :test 'eql))
 (defvar *delete-hooks* (make-hash-table :test 'eql))
 
-(defun setup-hook (identifier)
-  (gethash identifier *setup-hooks*))
+(defun modularize-hook (identifier)
+  (gethash identifier *modularize-hooks*))
 
-(defun (setf setup-hook) (function identifier)
-  (setf (gethash identifier *setup-hooks*) function))
+(defun (setf modularize-hook) (function identifier)
+  (setf (gethash identifier *modularize-hooks*) function))
 
-(defun remove-setup-hook (identifier)
-  (remhash identifier *setup-hooks*))
+(defun remove-modularize-hook (identifier)
+  (remhash identifier *modularize-hooks*))
 
-(defun call-setup-hooks (package)
-  (loop for hook being the hash-values of *setup-hooks*
+(defun call-modularize-hooks (package)
+  (loop for hook being the hash-values of *modularize-hooks*
         do (funcall hook package)))
 
-(defmacro define-setup-hook ((modulevar &optional identifier) &body body)
+(defmacro define-modularize-hook ((modulevar &optional identifier) &body body)
   `(eval-when (:compile-toplevel :load-toplevel :execute)
-     (setf (setup-hook
+     (setf (modularize-hook
             (or ,identifier
                 (intern (package-name *package*) "KEYWORD")))
            #'(lambda (,modulevar) ,@body))))

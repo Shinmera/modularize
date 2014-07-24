@@ -17,10 +17,10 @@
    #:load-module)
   ;; hooks.lisp
   (:export
-   #:setup-hook
-   #:remove-setup-hook
-   #:call-setup-hooks
-   #:define-setup-hook
+   #:modularize-hook
+   #:remove-modularize-hook
+   #:call-modularize-hooks
+   #:define-modularize-hook
    #:delete-hook
    #:remove-delete-hook
    #:call-delete-hooks
@@ -40,3 +40,4 @@
    #:demodularize
    #:delete-module
    #:map-modules))
+
