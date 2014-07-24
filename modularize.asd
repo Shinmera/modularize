@@ -21,5 +21,6 @@
                (:file "package-toolkit")
                (:file "hooks")
                (:file "module")
+               (:file "options")
                (:file "asdf"))
   :depends-on ())
