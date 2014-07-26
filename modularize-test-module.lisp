@@ -4,11 +4,11 @@
  Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
-(define-module test-module
+(define-module modularize-test-module
   (:use #:cl #:modularize)
   (:export #:greet))
 
-(in-package #:modularize.mod.test-module)
+(in-package #:modularize-test-module)
 
 (defun greet ()
   (format T "~&Hello from ~a!~%" (current-module)))
