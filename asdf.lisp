@@ -23,9 +23,12 @@
   ((module-name :initform NIL :initarg :module-name :accessor virtual-module-name))
   (:documentation ""))
 
+(defmethod virtual-module-name ((module module))
+  (or (or (slot-value module 'module-name)
+          (string-upcase (asdf:component-name module)))))
+
 (defun register-virtual-module (module)
-  (let ((name (string (or (virtual-module-name module)
-                          (asdf:component-name module)))))
+  (let ((name (string (virtual-module-name module))))
     (setf (virtual-module name) module
           (virtual-module (make-identifier name)) module)))
 
