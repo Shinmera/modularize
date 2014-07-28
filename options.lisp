@@ -22,19 +22,16 @@
   `(shadow ',symbols ,package))
 
 (define-option-expander shadowing-import-from (package import-package &rest symbols)
-  `(shadowing-import ',(collect-symbols-from import-package symbols) ,package))
+  `(shadowing-import (collect-symbols-from ,import-package ',symbols) ,package))
 
 (define-option-expander import-from (package import-package &rest symbols)
-  `(import ',(collect-symbols-from import-package symbols) ,package))
+  `(import (collect-symbols-from ,import-package ',symbols) ,package))
 
 (define-option-expander export (package &rest symbols)
-  `(export ',(loop for symbol in symbols
-                   collect (intern (string symbol) package)) ,package))
+  `(export (mapcar #'(lambda (s) (intern (string s) ,package)) ',symbols) ,package))
 
 (define-option-expander intern (package &rest symbols)
-  `(progn
-     ,@(loop for symbol in symbols
-             collect `(intern ',(symbol-name symbol) ,package))))
+  `(mapcar #'(lambda (s) (intern (string s) ,package)) ',symbols))
 
 (define-option-expander size (package n)
   (declare (ignore n))
