@@ -10,8 +10,9 @@
   ;; asdf.lisp
   (:export
    #:module
-   #:virtual-module-name
    #:virtual-module
+   #:remove-virtual-module
+   #:virtual-module-name
    #:virtual-module-not-found
    #:register-virtual-module
    #:load-module)

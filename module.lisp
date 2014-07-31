@@ -6,19 +6,28 @@
 
 (in-package #:org.tymoonnext.radiance.lib.modularize)
 
-(defvar *module-storages* (make-hash-table :test 'eql))
+(defvar *module-storages* (make-hash-table :test 'eql)
+  "Table mapping module packages to their storage tables.")
 
 (define-condition module-not-found (error)
   ((%requested :initarg :requested :initform (error "REQUESTED required.") :reader requested))
-  (:report (lambda (c s) (format s "Module ~s requested but not found." (requested c)))))
+  (:report (lambda (c s) (format s "Module ~s requested but not found." (requested c))))
+  (:documentation "Condition raised when a module is requested but not found."))
 
 (defun extract-name (identifier)
+  "Extracts the name from an identifier, which is to say the string after the last dot."
   (subseq identifier (1+ (position #\. identifier :from-end T))))
 
 (defun make-identifier (name)
+  "Turns a name into an identifier by prepending MODULARIZE.MOD. to it."
   (format NIL "MODULARIZE.MOD.~a" (string name)))
 
 (defun module (&optional identifier)
+  "Attempts to return the matching module package.
+If not possible, a condition of type MODULE-NOT-FOUND is raised.
+
+You may pass a STRING, SYMBOL or PACKAGE as the identifier.
+If NIL is passed, the current *PACKAGE* is used instead."
   (let ((package
           (etypecase identifier
             (null *package*)
@@ -30,6 +39,7 @@
         (error 'module-not-found :requested identifier))))
 
 (defun module-p (object)
+  "Returns T if the passed object is or resolves to a module package, otherwise NIL."
   (etypecase object
     (null NIL)
     (package (not (null (gethash object *module-storages*))))
@@ -37,36 +47,48 @@
     (symbol (module-p (find-package object)))))
 
 (defun module-storage (module &optional (key NIL k-s))
+  "Returns the module storage table of the module or a field from it if a key is passed."
   (if k-s
       (gethash key (module-storage module))
       (gethash (module module) *module-storages*)))
 
 (defun (setf module-storage) (value module &optional (key NIL k-s))
+  "Sets either the module storage table directly or a field on it if a key is passed."
   (if k-s
       (setf (gethash key (module-storage module)) value)
       (setf (gethash (module module) *module-storages*) value)))
 
 (defun module-storage-remove (module key)
+  "Removes a key from the module storage table."
   (remhash key (module-storage module)))
 
 (defun module-identifier (module)
+  "Returns the identifier of the module."
   (module-storage module :identifier))
 
 (defun module-name (module)
+  "Returns the name of the module."
   (module-storage module :name))
 
 (defmacro current-module ()
+  "Macro that expands to the module in the current package.
+Useful to establish a module context."
   (module))
 
-(defgeneric expand-option (type package args))
+(defgeneric expand-option (type package args)
+  (:documentation "Called to expand module options into forms."))
 
 (defmacro define-option-expander (name (package &rest arguments) &body body)
+  "Defines a new option expander that is called whenever the option is used in the module definition.
+This should expand to forms that can be used in the module definition. Note that all expansions happen
+AFTER the modularize call, so you can use the module storage in your expansions."
   (let ((args (gensym "ARGS")))
     `(defmethod expand-option ((,(gensym "TYPE") (eql ,(intern (string name) "KEYWORD"))) ,package ,args)
        (destructuring-bind ,arguments ,args
          ,@body))))
 
 (defmacro expand-module (name &rest options)
+  "Expands the module options into their proper forms using EXPAND-OPTION for each."
   (let ((package (find-package name)))
     (unless package
       (error "Cannot expand options for ~s: No such package." name))
@@ -75,6 +97,11 @@
                collect (expand-option type package args)))))
 
 (defmacro define-module (name &body options)
+  "Defines a new module.
+
+This essentially defines a new package with the given name,
+calls MODULARIZE on it and then expands all options to extend
+the package/module."
   (let ((name (string name)))
     `(eval-when (:compile-toplevel :load-toplevel :execute)
        (defpackage ,(make-symbol name)
@@ -87,6 +114,10 @@
        (expand-module ,name ,@options))))
 
 (defmacro define-module-extension ((module name) &body options)
+  "Defines a module extension.
+
+This gives the existing module new nicknames and expands the
+given options on it to add functionality."
   (let ((module (module module))
         (name (string name)))
     `(eval-when (:compile-toplevel :load-toplevel :execute)
@@ -101,6 +132,10 @@
        ,module)))
 
 (defun modularize (&key (package *package*) (name (package-name package)))
+  "Turns the given package into one that is identified as a module.
+
+What this does is register the package on the module storage table,
+add the name and identifiers to it, and then call the modularize hooks."
   (let ((identifier (make-identifier name)))
     ;; Push the identifier onto the nicks list
     (let ((ident-package (find-package identifier)))
@@ -117,10 +152,19 @@
     package))
 
 (defun demodularize (module)
+  "Removes the module from the module storage table, essentially
+returning it back to a normal package. Any additional effects by
+module options or modularization hooks can of course not be undone
+by this."
   (remhash (module module) *module-storages*)
   module)
 
 (defun delete-module (module)
+  "Attempts to completely delete the given module.
+
+This first calls the delete hooks, then demodularizes the package,
+ unbinds all symbols in the package from values and functions, and
+finally deletes the package."
   (let* ((package (module module))
          (identifier (module-identifier module))
          (extensions (module-storage package :extensions)))
@@ -132,6 +176,7 @@
     (values identifier extensions)))
 
 (defun map-modules (function)
+  "Calls the function once with each module in no particular order."
   (maphash #'(lambda (key module)
                (declare (ignore key))
                (funcall function module))

@@ -7,18 +7,26 @@
 (in-package #:org.tymoonnext.radiance.lib.modularize)
 
 (defun add-package-nickname (package nickname)
+  "Adds the nickname onto the package's nicknames list."
   (let ((nicks (package-nicknames package)))
     (unless (member nickname nicks :test #'string=)
       (rename-package package (package-name package)
                       (cons nickname nicks)))))
 
 (defun collect-symbols-from (package symbols)
+  "Collects all given symbols from the package."
   (loop with importing-package = (find-package package)
         for symbol in symbols
-        collect (find-symbol (symbol-name symbol)
-                             importing-package)))
+        collect (or (find-symbol (string symbol)
+                                 importing-package)
+                    (error "Symbol ~s not found in ~s" symbol package))))
 
 (defun extend-package (package definition-options)
+  "Extends the package with the package definition options.
+Any option except for the SIZE option is allowed.
+Note that this only ADDS onto the package and does not
+remove any options defined prior. As in, nicknames are
+only added on, but not removed."
   (setf package
         (etypecase package
           (package package)
@@ -47,6 +55,8 @@
               (error "SIZE option not applicable to EXTEND-PACKAGE.")))))
 
 (defun unbind-and-delete-package (package)
+  "Unbinds all symbols in the package from their functions and values
+and finally deletes the package."
   (do-symbols (symbol package)
     (when (eql (symbol-package symbol) package)
       (when (fboundp symbol)
