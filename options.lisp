@@ -13,7 +13,7 @@
 
 (define-option-expander documentation (package documentation)
   `(setf (documentation ,package T)
-         ,(format NIL "~a -- ~a" (documentation package T) documentation)))
+         ,documentation))
 
 (define-option-expander use (package &rest packages)
   `(use-package ',packages ,package))
