@@ -4,9 +4,9 @@
  Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
-(defpackage org.tymoonnext.radiance.lib.modularize
+(defpackage #:modularize
   (:use #:cl)
-  (:nicknames #:modularize #:radiance-modularize)
+  (:nicknames #:org.tymoonnext.radiance.lib.modularize #:radiance-modularize)
   ;; asdf.lisp
   (:export
    #:module
