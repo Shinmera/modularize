@@ -10,12 +10,12 @@
 
 (defsystem modularize
   :name "Modularize"
-  :version "0.0.1"
+  :version "0.2.1"
   :license "Artistic"
   :author "Nicolas Hafner <shinmera@tymoon.eu>"
   :maintainer "Nicolas Hafner <shinmera@tymoon.eu>"
   :description "A modularization framework"
-  :long-description ""
+  :homepage "https://github.com/Shinmera/modularize"
   :serial T
   :components ((:file "package")
                (:file "package-toolkit")
