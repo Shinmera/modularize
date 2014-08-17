@@ -104,12 +104,9 @@ calls MODULARIZE on it and then expands all options to extend
 the package/module."
   (let ((name (string name)))
     `(eval-when (:compile-toplevel :load-toplevel :execute)
-       (defpackage ,(make-symbol name)
-         ,@(let ((package (find-package name)))
-             (when package
-               `((:export ,@(let ((list ()))
-                              (do-external-symbols (symbol package list)
-                                (push symbol list))))))))
+       ,@(let ((package (find-package name)))
+           (unless package
+             `((defpackage ,(make-symbol name) (:use)))))
        (modularize :package (find-package ,name) :name ,name)
        (expand-module ,name ,@options))))
 
