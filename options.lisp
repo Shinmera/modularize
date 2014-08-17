@@ -22,10 +22,10 @@
   `(shadow ',symbols ,package))
 
 (define-option-expander shadowing-import-from (package import-package &rest symbols)
-  `(shadowing-import (collect-symbols-from ,import-package ',symbols) ,package))
+  `(shadowing-import (collect-symbols-from ',import-package ',symbols) ,package))
 
 (define-option-expander import-from (package import-package &rest symbols)
-  `(import (collect-symbols-from ,import-package ',symbols) ,package))
+  `(import (collect-symbols-from ',import-package ',symbols) ,package))
 
 (define-option-expander export (package &rest symbols)
   `(export (mapcar #'(lambda (s) (intern (string s) ,package)) ',symbols) ,package))
