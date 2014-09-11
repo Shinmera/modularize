@@ -174,7 +174,13 @@ finally deletes the package."
 
 (defun map-modules (function)
   "Calls the function once with each module in no particular order."
-  (maphash #'(lambda (key module)
-               (declare (ignore key))
+  (maphash #'(lambda (module storage)
+               (declare (ignore storage))
                (funcall function module))
            *module-storages*))
+
+(defun list-modules ()
+  "Returns a list of all modules in no particular order."
+  (let ((modules ()))
+    (map-modules #'(lambda (module) (push module modules)))
+    modules))

@@ -43,7 +43,8 @@
    #:modularize
    #:demodularize
    #:delete-module
-   #:map-modules))
+   #:map-modules
+   #:list-modules))
 
 (defpackage org.tymoonnext.radiance.lib.modularize.user
   (:use #:cl #:modularize)
