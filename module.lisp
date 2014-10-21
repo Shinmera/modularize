@@ -108,7 +108,8 @@ the package/module."
            (unless package
              `((defpackage ,(make-symbol name) (:use)))))
        (modularize :package (find-package ,name) :name ,name)
-       (expand-module ,name ,@options))))
+       (expand-module ,name ,@options)
+       (find-package ,name) )))
 
 (defmacro define-module-extension ((module name) &body options)
   "Defines a module extension.
