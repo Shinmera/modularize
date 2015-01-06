@@ -14,6 +14,11 @@
   (:report (lambda (c s) (format s "Module ~s requested but not found." (requested c))))
   (:documentation "Condition raised when a module is requested but not found."))
 
+(define-condition not-a-module (error)
+  ((%requested :initarg :requested :initform (error "REQUESTED required.") :reader requested))
+  (:report (lambda (c s) (format s "Module ~s requested but while the package exists, it is not a module." (requested c))))
+  (:documentation "Condition raised when a module is requested but only a package of the requested name exists."))
+
 (defun extract-name (identifier)
   "Extracts the name from an identifier, which is to say the string after the last dot."
   (subseq identifier (1+ (position #\. identifier :from-end T))))
@@ -22,29 +27,31 @@
   "Turns a name into an identifier by prepending MODULARIZE.MOD. to it."
   (format NIL "MODULARIZE.MOD.~a" (string name)))
 
+(defun module-p (object)
+  "Returns T if the passed object is or resolves to a module package, otherwise NIL."
+  (typecase object
+    (package (not (null (gethash object *module-storages*))))
+    (string (module-p (find-package object)))
+    (symbol (module-p (find-package object)))
+    (T NIL)))
+
 (defun module (&optional identifier)
   "Attempts to return the matching module package.
 If not possible, a condition of type MODULE-NOT-FOUND is raised.
 
 You may pass a STRING, SYMBOL or PACKAGE as the identifier.
 If NIL is passed, the current *PACKAGE* is used instead."
-  (let ((package
-          (etypecase identifier
-            (null *package*)
-            (string (find-package identifier))
-            (symbol (find-package identifier))
-            (package identifier))))
-    (if (and package (module-p package))
-        package
-        (error 'module-not-found :requested identifier))))
+  (with-package (package (or identifier *package*))
+    (cond ((not package)
+           (error 'module-not-found :requested identifier))
+          ((not (module-p package))
+           (error 'not-a-module :requested package))
+          (T package))))
 
-(defun module-p (object)
-  "Returns T if the passed object is or resolves to a module package, otherwise NIL."
-  (etypecase object
-    (null NIL)
-    (package (not (null (gethash object *module-storages*))))
-    (string (module-p (find-package object)))
-    (symbol (module-p (find-package object)))))
+(defmacro with-module ((var &optional (module var)) &body body)
+  "Binds the resolved MODULE to VAR."
+  `(let ((,var (module ,module)))
+     ,@body))
 
 (defun module-storage (module &optional (key NIL k-s))
   "Returns the module storage table of the module or a field from it if a key is passed."
@@ -73,7 +80,7 @@ If NIL is passed, the current *PACKAGE* is used instead."
 (defmacro current-module ()
   "Macro that expands to the module in the current package.
 Useful to establish a module context."
-  (module))
+  (dump-package (module)))
 
 (defgeneric expand-option (type package args)
   (:documentation "Called to expand module options into forms."))
@@ -87,11 +94,9 @@ AFTER the modularize call, so you can use the module storage in your expansions.
        (destructuring-bind ,arguments ,args
          ,@body))))
 
-(defmacro expand-module (name &rest options)
+(defmacro expand-module (package &rest options)
   "Expands the module options into their proper forms using EXPAND-OPTION for each."
-  (let ((package (find-package name)))
-    (unless package
-      (error "Cannot expand options for ~s: No such package." name))
+  (with-package (package)
     `(progn
        ,@(loop for (type . args) in options
                collect (expand-option type package args)))))
@@ -102,32 +107,33 @@ AFTER the modularize call, so you can use the module storage in your expansions.
 This essentially defines a new package with the given name,
 calls MODULARIZE on it and then expands all options to extend
 the package/module."
-  (let ((name (string name)))
+  (let ((name (string name))
+        (package (gensym "PACKAGE")))
     `(eval-when (:compile-toplevel :load-toplevel :execute)
-       ,@(let ((package (find-package name)))
-           (unless package
-             `((defpackage ,(make-symbol name) (:use)))))
-       (modularize :package (find-package ,name) :name ,name)
-       (expand-module ,name ,@options)
-       (find-package ,name) )))
+       (let ((,package (or (find-package ,name)
+                           (make-package ,name :use ()))))
+         (modularize :package ,package :name ,name)
+         (expand-module ,package ,@options)
+         ,package))))
 
-(defmacro define-module-extension ((module name) &body options)
+(defmacro define-module-extension ((module-identifier name) &body options)
   "Defines a module extension.
 
 This gives the existing module new nicknames and expands the
 given options on it to add functionality."
-  (let ((module (module module))
+  (let ((module (gensym "MODULE"))
         (name (string name)))
     `(eval-when (:compile-toplevel :load-toplevel :execute)
-       (pushnew ,name (module-storage ,module :extensions) :test #'string=)
-       (pushnew ,(make-identifier name) (module-storage ,module :extensions) :test #'string=)
-       ;; Add nicknames so the extension can be IN-PACKAGEd as if it
-       ;; were a proper module.
-       (extend-package ,module '((:nicknames
-                                  ,(make-symbol name)
-                                  ,(make-symbol (make-identifier name)))))
-       (expand-module ,name ,@options)
-       ,module)))
+       (with-module (,module ,module-identifier)
+         (pushnew ,name (module-storage ,module :extensions) :test #'string=)
+         (pushnew ,(make-identifier name) (module-storage ,module :extensions) :test #'string=)
+         ;; Add nicknames so the extension can be IN-PACKAGEd as if it
+         ;; were a proper module.
+         (extend-package ,module '((:nicknames
+                                    ,(make-symbol name)
+                                    ,(make-symbol (make-identifier name)))))
+         (expand-module ,name ,@options)
+         ,module))))
 
 (defun modularize (&key (package *package*) (name (package-name package)))
   "Turns the given package into one that is identified as a module.

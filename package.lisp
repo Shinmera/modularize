@@ -29,8 +29,10 @@
   ;; module.lisp
   (:export
    #:module-not-found
-   #:module
+   #:not-a-module
    #:module-p
+   #:module
+   #:with-module
    #:module-storage
    #:module-storage-remove
    #:module-identifier
