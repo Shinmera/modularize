@@ -80,7 +80,7 @@ If NIL is passed, the current *PACKAGE* is used instead."
 (defmacro current-module ()
   "Macro that expands to the module in the current package.
 Useful to establish a module context."
-  (dump-package (module)))
+  `(find-package ,(package-name (module))))
 
 (defgeneric expand-option (type package args)
   (:documentation "Called to expand module options into forms."))
@@ -94,12 +94,11 @@ AFTER the modularize call, so you can use the module storage in your expansions.
        (destructuring-bind ,arguments ,args
          ,@body))))
 
-(defmacro expand-module (package &rest options)
+(defun expand-module (package options)
   "Expands the module options into their proper forms using EXPAND-OPTION for each."
   (with-package (package)
-    `(progn
-       ,@(loop for (type . args) in options
-               collect (expand-option type package args)))))
+    (loop for (type . args) in options
+          do (expand-option type package args))))
 
 (defmacro define-module (name &body options)
   "Defines a new module.
@@ -113,7 +112,7 @@ the package/module."
        (let ((,package (or (find-package ,name)
                            (make-package ,name :use ()))))
          (modularize :package ,package :name ,name)
-         (expand-module ,package ,@options)
+         (expand-module ,name ',options)
          ,package))))
 
 (defmacro define-module-extension ((module-identifier name) &body options)
@@ -132,7 +131,7 @@ given options on it to add functionality."
          (extend-package ,module '((:nicknames
                                     ,(make-symbol name)
                                     ,(make-symbol (make-identifier name)))))
-         (expand-module ,name ,@options)
+         (expand-module ,module ',options)
          ,module))))
 
 (defun modularize (&key (package *package*) (name (package-name package)))
