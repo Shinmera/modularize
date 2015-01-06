@@ -87,7 +87,7 @@ Useful to establish a module context."
 
 (defmacro define-option-expander (name (package &rest arguments) &body body)
   "Defines a new option expander that is called whenever the option is used in the module definition.
-This should expand to forms that can be used in the module definition. Note that all expansions happen
+This should run whatever is necessary to accomplish the desired option effect. The expanders are run
 AFTER the modularize call, so you can use the module storage in your expansions."
   (let ((args (gensym "ARGS")))
     `(defmethod expand-option ((,(gensym "TYPE") (eql ,(intern (string name) "KEYWORD"))) ,package ,args)
