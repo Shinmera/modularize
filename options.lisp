@@ -6,32 +6,50 @@
 
 (in-package #:org.tymoonnext.radiance.lib.modularize)
 
+(defun dump-package (package)
+  "Creates a form that is dumpable in macro-expansions and will evaluate to the given PACKAGE."
+  `(ensure-package ,(package-name (ensure-package package))))
+
+(defmacro with-package-dump-binding ((var &optional (package var)) &body body)
+  "Creates a binding form for PACKAGE with the gensym for the package bound to VAR."
+  `(let ((,var (gensym "PACKAGE")))
+     `(let ((,,var ,(dump-package ,package)))
+        ,,@body)))
+
 (define-option-expander nicknames (package &rest nicknames)
-  `(progn
-     ,@(loop for nick in nicknames
-             collect `(add-package-nickname ,package ',nick))))
+  (with-package-dump-binding (package)
+    `(progn
+       ,@(loop for nick in nicknames
+               collect `(add-package-nickname ,package ',nick)))))
 
 (define-option-expander documentation (package documentation)
-  `(setf (documentation ,package T)
+  `(setf (documentation ,(dump-package package) T)
          ,documentation))
 
 (define-option-expander use (package &rest packages)
-  `(use-package ',packages ,package))
+  `(use-package ',packages
+                ,(dump-package package)))
 
 (define-option-expander shadow (package &rest symbols)
-  `(shadow ',symbols ,package))
+  `(shadow ',symbols
+           ,(dump-package package)))
 
 (define-option-expander shadowing-import-from (package import-package &rest symbols)
-  `(shadowing-import (collect-symbols-from ',import-package ',symbols) ,package))
+  `(shadowing-import (collect-symbols-from ',import-package ',symbols)
+                     ,(dump-package package)))
 
 (define-option-expander import-from (package import-package &rest symbols)
-  `(import (collect-symbols-from ',import-package ',symbols) ,package))
+  `(import (collect-symbols-from ',import-package ',symbols)
+           ,(dump-package package)))
 
 (define-option-expander export (package &rest symbols)
-  `(export (mapcar #'(lambda (s) (intern (string s) ,package)) ',symbols) ,package))
+  (with-package-dump-binding (package)
+    `(export (mapcar #'(lambda (s) (intern (string s) ,package)) ',symbols)
+             ,package)))
 
 (define-option-expander intern (package &rest symbols)
-  `(mapcar #'(lambda (s) (intern (string s) ,package)) ',symbols))
+  (with-package-dump-binding (package)
+    `(mapcar #'(lambda (s) (intern (string s) ,package)) ',symbols)))
 
 (define-option-expander size (package n)
   (declare (ignore n))
