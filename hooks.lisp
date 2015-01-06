@@ -4,7 +4,7 @@
  Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
-(in-package #:org.tymoonnext.radiance.lib.modularize)
+(in-package #:org.shirakumo.radiance.lib.modularize)
 
 (defvar *modularize-hooks* (make-hash-table :test 'eql)
   "Table mapping the modularization hook names to their functions.")

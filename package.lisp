@@ -4,9 +4,10 @@
  Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
+(in-package #:cl-user)
 (defpackage #:modularize
   (:use #:cl)
-  (:nicknames #:org.tymoonnext.radiance.lib.modularize #:radiance-modularize)
+  (:nicknames #:org.shirakumo.radiance.lib.modularize #:radiance-modularize)
   ;; asdf.lisp
   (:export
    #:module
@@ -48,6 +49,6 @@
    #:map-modules
    #:list-modules))
 
-(defpackage org.tymoonnext.radiance.lib.modularize.user
+(defpackage #:org.shirakumo.radiance.lib.modularize.user
   (:use #:cl #:modularize)
   (:nicknames #:modularize-user))

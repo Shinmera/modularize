@@ -4,7 +4,7 @@
  Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
-(in-package #:org.tymoonnext.radiance.lib.modularize)
+(in-package #:org.shirakumo.radiance.lib.modularize)
 
 (define-option-expander nicknames (package &rest nicknames)
   (loop for nick in nicknames

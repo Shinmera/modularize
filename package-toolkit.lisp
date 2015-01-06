@@ -4,7 +4,7 @@
  Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
-(in-package #:org.tymoonnext.radiance.lib.modularize)
+(in-package #:org.shirakumo.radiance.lib.modularize)
 
 (defun ensure-package (thing)
   "Ensures that THING is a package-object, or errors if it cannot resolve it to a package."

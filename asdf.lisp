@@ -4,7 +4,7 @@
  Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
-(in-package #:org.tymoonnext.radiance.lib.modularize)
+(in-package #:org.shirakumo.radiance.lib.modularize)
 
 (defvar *virtual-module-map* (make-hash-table :test 'equal)
   "Map of virtual module names to the asdf system instances of the virtual modules.")
