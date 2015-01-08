@@ -30,6 +30,7 @@
 (defun module-p (object)
   "Returns T if the passed object is or resolves to a module package, otherwise NIL."
   (typecase object
+    (null NIL)
     (package (not (null (gethash object *module-storages*))))
     (string (module-p (find-package object)))
     (symbol (module-p (find-package object)))
