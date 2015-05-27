@@ -11,5 +11,10 @@
 (defsystem modularize-test-module
   :class "modularize:module"
   :components ((:file "modularize-test-module"))
-  :defsystem-depends-on (:modularize))
+  :defsystem-depends-on (:modularize)
+  :version "1.0.0"
+  :license "Artistic"
+  :author "Nicolas Hafner <shinmera@tymoon.eu>"
+  :maintainer "Nicolas Hafner <shinmera@tymoon.eu>"
+  :description "Test module system for modularize.")
 
