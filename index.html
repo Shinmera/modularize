@@ -1,500 +1,105 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta charset="utf-8"/>
-    <title>MODULARIZE</title>
-    <style type="text/css">
-      code a{text-decoration:none;}
-      h1{display:inline-block;font-size: 28pt;margin-bottom:0;}
-      code{font-family: Consolas, Inconsolata, monospace;}
-      h4{display: inline-block;margin:0;padding:0;}
-      ul{list-style: none;}
-      .package li{margin-bottom: 20px;}
-      .package pre{margin: 0 0 0 10px; white-space: pre-wrap;}
-      .package .nicknames{font-size: 12pt; font-weight: normal;}
-      table{margin: 20px;}
-      td{padding-bottom: 10px;}
-    </style>
-  </head>
-  <body>
-    <header>
-      <h1>modularize</h1>
-      <span>0.2.1</span>
-      <p>A modularization framework</p>
-    </header>
-    <div id="content">
-      <article>
-        <documentate>
-          <span><h2>About Modularize</h2>
+<!DOCTYPE html> <html xmlns="http://www.w3.org/1999/xhtml"> <head> <meta charset="utf-8"/> <title>Modularize</title> <meta name="viewport" content="width=device-width"/> <meta name="description" content="A modularization framework"/> <meta name="author" content="Nicolas Hafner &lt;shinmera@tymoon.eu&gt;"/> <style type="text/css"> body{
+          max-width: 1024px;
+          margin: 0 auto 0 auto;
+          font-family: sans-serif;
+          color: #333333;
+          font-size: 14pt;
+          padding: 5px;
+      }
 
-<p>Modularize is an attempt at providing a common interface to segregate major application components. This is achieved by adding special treatment to packages. Each module is a package that is specially registered, which allows it to interact and co-exist with other modules in better ways. For instance, by adding module definition options you can introduce mechanisms to tie modules together in functionality, hook into each other and so on.</p>
+      body>header{
+          display:flex;
+          align-items: center;
+          justify-content: center;
+          flex-direction: column;
+          max-width: 100%;
+      }
 
-<h2>How To</h2>
+      img{
+          max-width: 100%;
+          max-height: 100%;
+      }
 
-<p>Each module should consist of a <code><a href="#MODULARIZE:DEFINE-MODULE">DEFINE-MODULE</a></code> form and an ASDF system with the superclass <code><a href="#MODULARIZE:MODULE">MODULARIZE:MODULE</a></code>. <code><a href="#MODULARIZE:DEFINE-MODULE">DEFINE-MODULE</a></code> acts as a wrapper around <code><a href="http://l1sp.org/cl/DEFPACKAGE">DEFPACKAGE</a></code>, so it will replace your usual <code><a href="http://l1sp.org/cl/DEFPACKAGE">DEFPACKAGE</a></code> form. Any option you would use in <code><a href="http://l1sp.org/cl/DEFPACKAGE">DEFPACKAGE</a></code> is also usable in <code><a href="#MODULARIZE:DEFINE-MODULE">DEFINE-MODULE</a></code>, but the latter also allows for custom-defined options that perform specific actions upon module creation.</p>
+      code{
+          font-family: Consolas, Inconsolata, monospace;
+      }
 
-<pre><code>(<a href="#MODULARIZE:DEFINE-MODULE">define-module</a> test-module
+      a{
+          text-decoration: none;
+          color: #0055AA;
+      }
+
+      #documentation{
+          text-align: justify;
+      }
+
+      #documentation pre{
+          margin-left: 20px;
+      }
+
+      #symbol-index>ul{
+          list-style: none;
+          padding: 0;
+      }
+      #symbol-index .package>ul{
+          list-style: none;
+          padding: 0 0 0 10px;
+      }
+      #symbol-index .package .nicknames{
+          font-weight: normal;
+      }
+      #symbol-index .package h4{
+          display: inline-block;
+          margin: 0;
+      }
+      #symbol-index .package article{
+          margin: 0 0 15px 0;
+      }
+      #symbol-index .package article header{
+          font-size: 1.2em;
+          font-weight: normal;
+      }
+      #symbol-index .package .name{
+          margin-right: 5px;
+      }
+      #symbol-index .package .docstring{
+          margin: 0 0 0 15px;
+          white-space: pre-wrap;
+          font-size: 12pt;
+      }
+
+      @media (max-width: 800px){
+          body{font-size: 12pt;}
+      } </style> </head> <body> <header> <h1>modularize</h1> <span class="version">0.3.1</span> <p class="description">A modularization framework</p> </header> <main> <article id="documentation">  <div><h2>About Modularize</h2> <p>Modularize is an attempt at providing a common interface to segregate major application components. This is achieved by adding special treatment to packages. Each module is a package that is specially registered, which allows it to interact and co-exist with other modules in better ways. For instance, by adding module definition options you can introduce mechanisms to tie modules together in functionality, hook into each other and so on.</p> <h2>How To</h2> <p>Each module should consist of a <code><a href="#MODULARIZE:DEFINE-MODULE">DEFINE-MODULE</a></code> form and an ASDF system with the superclass <code><a href="#MODULARIZE:MODULE">MODULARIZE:MODULE</a></code>. <code><a href="#MODULARIZE:DEFINE-MODULE">DEFINE-MODULE</a></code> acts as a wrapper around <code><a href="http://l1sp.org/cl/defpackage">DEFPACKAGE</a></code>, so it will replace your usual <code><a href="http://l1sp.org/cl/defpackage">DEFPACKAGE</a></code> form. Any option you would use in <code><a href="http://l1sp.org/cl/defpackage">DEFPACKAGE</a></code> is also usable in <code><a href="#MODULARIZE:DEFINE-MODULE">DEFINE-MODULE</a></code>, but the latter also allows for custom-defined options that perform specific actions upon module creation.</p> <pre><code>(<a href="#MODULARIZE:DEFINE-MODULE">define-module</a> test-module
   (:use #:cl #:modularize)
-  (:export #:greet))</code></pre>
-
-<p>If for some reason you absolutely do not want to use <code><a href="#MODULARIZE:DEFINE-MODULE">DEFINE-MODULE</a></code>, you may define your package manually and call <code><a href="#MODULARIZE:MODULARIZE">MODULARIZE</a></code> on it afterwards. Note though that you also need to manually perform all changes that additional module options may otherwise perform for you. If your module-name somehow differs from the asdf system, you will need to specify this in your asdf system definition:</p>
-
-<pre><code>(asdf:defsystem some-test-module
+  (:export #:greet))</code></pre> <p>If for some reason you absolutely do not want to use <code><a href="#MODULARIZE:DEFINE-MODULE">DEFINE-MODULE</a></code>, you may define your package manually and call <code><a href="#MODULARIZE:MODULARIZE">MODULARIZE</a></code> on it afterwards. Note though that you also need to manually perform all changes that additional module options may otherwise perform for you. If your module-name somehow differs from the asdf system, you will need to specify this in your asdf system definition:</p> <pre><code>(asdf:defsystem some-test-module
   :class &quot;modularize:module&quot;
   :defsystem-depends-on (:modularize)
   :module-name &quot;test-module&quot;
-  ...)</code></pre>
-
-<p>When loading a module-system, <code><a href="http://l1sp.org/cl/*PACKAGE*">*PACKAGE*</a></code> is automatically bound to <code>MODULARIZE-USER</code> so that you may use <code><a href="#MODULARIZE:DEFINE-MODULE">DEFINE-MODULE</a></code> without having to switch to a specific package first. It might still be a good idea to precede your <code><a href="#MODULARIZE:DEFINE-MODULE">DEFINE-MODULE</a></code> form with an <code>(<a href="http://l1sp.org/cl/IN-PACKAGE">in-package</a> #:modularize-user)</code> though. The main difference over packages is that each module has a central storage table, which you can access with <code><a href="#MODULARIZE:MODULE-STORAGE">MODULE-STORAGE</a></code>. This allows you to save metadata on modules to keep track of the different parts each module might play in your application.</p>
-
-<p>Another function that might prove useful is <code><a href="#MODULARIZE:DELETE-MODULE">DELETE-MODULE</a></code>, which attempts to offer a mechanism to completely remove a module so as to revert its changes. Without any further additions, this will simply result in all symbols in the module package being <code><a href="http://l1sp.org/cl/MAKUNBOUND">MAKUNBOUND</a></code> and <code><a href="http://l1sp.org/cl/FMAKUNBOUND">FMAKUNBOUND</a></code> and the package getting deleted. Since a module might also cause changes outside of its own package, it is therefore advised to add deletion hooks through <code><a href="#MODULARIZE:DEFINE-DELETE-HOOK">DEFINE-DELETE-HOOK</a></code> as to make sure other kinds of changes can be cleaned up as well.</p>
-
-<p>Similarly if you want to tuck on functionality once a module is defined to initialise it, you can hook into that with <code><a href="#MODULARIZE:DEFINE-MODULARIZE-HOOK">DEFINE-MODULARIZE-HOOK</a></code> and <code><a href="#MODULARIZE:DEFINE-OPTION-EXPANDER">DEFINE-OPTION-EXPANDER</a></code>. The former works like <code><a href="#MODULARIZE:DEFINE-DELETE-HOOK">DEFINE-DELETE-HOOK</a></code> and is called once <code><a href="#MODULARIZE:MODULARIZE">MODULARIZE</a></code> is called on a package, after the package's storage has been set up. The latter allows you to declare custom forms that a <code><a href="#MODULARIZE:DEFINE-MODULE">DEFINE-MODULE</a></code> call should expand to. Note that module options are only expanded <em>after</em> <code><a href="#MODULARIZE:MODULARIZE">MODULARIZE</a></code> is called, so you may use the storage in your expansions.</p>
-
-<p>Lastly, if a component should extend the functionality of another, this can be more intuitively done through <code><a href="#MODULARIZE:DEFINE-MODULE-EXTENSION">DEFINE-MODULE-EXTENSION</a></code>. In looks and form it is the same as <code><a href="#MODULARIZE:DEFINE-MODULE">DEFINE-MODULE</a></code>, with the difference that it won't create a new package, but use the one it is extending. Through this you can export new functions and other additions without running into a multiple-package mess.</p>
-
-<p>For a super small sample use of a module, have a look at <a href="https://github.com/Shinmera/modularize/blob/master/modularize-test-module.asd">modularize-test-module.asd</a> and <a href="https://github.com/Shinmera/modularize/blob/master/modularize-test-module.lisp">modularize-test-module.lisp</a>. For extensions to the module system, have a gander at <a href="https://github.com/Shinmera/modularize-interfaces">modularize-interfaces</a> and <a href="https://github.com/Shinmera/modularize-hooks">modularize-hooks</a>.</p>
-</span>
-        </documentate>
-      </article>
-      <article>
-        <h2>Copyright</h2>
-        <span>modularize</span> is licensed under the <span><a href="https://tldrlegal.com/search?q=Artistic">Artistic</a></span> license and ©<span>2014</span> <span>Nicolas Hafner &lt;shinmera@tymoon.eu&gt;</span>. This library can be obtained on <a href="https://github.com/Shinmera/modularize">https://github.com/Shinmera/modularize</a>.
-      </article>
-      <article>
-        <h2>Package Index</h2>
-        <ul><li class="package">
-            <h3>
-              <a name="MODULARIZE" href="#MODULARIZE">MODULARIZE</a>
-              <span class="nicknames">(RADIANCE-MODULARIZE ORG.TYMOONNEXT.RADIANCE.LIB.MODULARIZE)</span>
-            </h3>
-            <ul><li>
-                <a name="MODULARIZE:MODULE"/>
-                <article>
-                  <header>
-                    <span>CLASS</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:MODULE">MODULE</a></h4>
-                      <span></span>
-                      <span></span>
-                    </code>
-                  </header>
-                  <pre>ASDF System subclass that serves as the class for virtual modules.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:MODULE-NOT-FOUND"/>
-                <article>
-                  <header>
-                    <span>CLASS</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:MODULE-NOT-FOUND">MODULE-NOT-FOUND</a></h4>
-                      <span></span>
-                      <span></span>
-                    </code>
-                  </header>
-                  <pre>Condition raised when a module is requested but not found.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:VIRTUAL-MODULE-NOT-FOUND"/>
-                <article>
-                  <header>
-                    <span>CLASS</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:VIRTUAL-MODULE-NOT-FOUND">VIRTUAL-MODULE-NOT-FOUND</a></h4>
-                      <span></span>
-                      <span></span>
-                    </code>
-                  </header>
-                  <pre>Condition raised when a virtual module was requested but could not be found.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:CALL-DELETE-HOOKS"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:CALL-DELETE-HOOKS">CALL-DELETE-HOOKS</a></h4>
-                      <span></span>
-                      <span>(PACKAGE)</span>
-                    </code>
-                  </header>
-                  <pre>Calls all deletion hooks on the package.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:CALL-MODULARIZE-HOOKS"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:CALL-MODULARIZE-HOOKS">CALL-MODULARIZE-HOOKS</a></h4>
-                      <span></span>
-                      <span>(PACKAGE)</span>
-                    </code>
-                  </header>
-                  <pre>Calls all modularization hooks on the package.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:DELETE-HOOK"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:DELETE-HOOK">DELETE-HOOK</a></h4>
-                      <span></span>
-                      <span>(IDENTIFIER)</span>
-                    </code>
-                  </header>
-                  <pre>Returns the deletion hook function associated with the identifier or NIL.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:DELETE-MODULE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:DELETE-MODULE">DELETE-MODULE</a></h4>
-                      <span></span>
-                      <span>(MODULE)</span>
-                    </code>
-                  </header>
-                  <pre>Attempts to completely delete the given module.
+  ...)</code></pre> <p>When loading a module-system, <code><a href="http://l1sp.org/cl/*package*">*PACKAGE*</a></code> is automatically bound to <code>MODULARIZE-USER</code> so that you may use <code><a href="#MODULARIZE:DEFINE-MODULE">DEFINE-MODULE</a></code> without having to switch to a specific package first. It might still be a good idea to precede your <code><a href="#MODULARIZE:DEFINE-MODULE">DEFINE-MODULE</a></code> form with an <code>(<a href="http://l1sp.org/cl/in-package">in-package</a> #:modularize-user)</code> though. The main difference over packages is that each module has a central storage table, which you can access with <code><a href="#MODULARIZE:MODULE-STORAGE">MODULE-STORAGE</a></code>. This allows you to save metadata on modules to keep track of the different parts each module might play in your application.</p> <p>Another function that might prove useful is <code><a href="#MODULARIZE:DELETE-MODULE">DELETE-MODULE</a></code>, which attempts to offer a mechanism to completely remove a module so as to revert its changes. Without any further additions, this will simply result in all symbols in the module package being <code><a href="http://l1sp.org/cl/makunbound">MAKUNBOUND</a></code> and <code><a href="http://l1sp.org/cl/fmakunbound">FMAKUNBOUND</a></code> and the package getting deleted. Since a module might also cause changes outside of its own package, it is therefore advised to add deletion hooks through <code><a href="#MODULARIZE:DEFINE-DELETE-HOOK">DEFINE-DELETE-HOOK</a></code> as to make sure other kinds of changes can be cleaned up as well.</p> <p>Similarly if you want to tuck on functionality once a module is defined to initialise it, you can hook into that with <code><a href="#MODULARIZE:DEFINE-MODULARIZE-HOOK">DEFINE-MODULARIZE-HOOK</a></code> and <code><a href="#MODULARIZE:DEFINE-OPTION-EXPANDER">DEFINE-OPTION-EXPANDER</a></code>. The former works like <code><a href="#MODULARIZE:DEFINE-DELETE-HOOK">DEFINE-DELETE-HOOK</a></code> and is called once <code><a href="#MODULARIZE:MODULARIZE">MODULARIZE</a></code> is called on a package, after the package's storage has been set up. The latter allows you to declare custom forms that a <code><a href="#MODULARIZE:DEFINE-MODULE">DEFINE-MODULE</a></code> call should expand to. Note that module options are only expanded <em>after</em> <code><a href="#MODULARIZE:MODULARIZE">MODULARIZE</a></code> is called, so you may use the storage in your expansions.</p> <p>Lastly, if a component should extend the functionality of another, this can be more intuitively done through <code><a href="#MODULARIZE:DEFINE-MODULE-EXTENSION">DEFINE-MODULE-EXTENSION</a></code>. In looks and form it is the same as <code><a href="#MODULARIZE:DEFINE-MODULE">DEFINE-MODULE</a></code>, with the difference that it won't create a new package, but use the one it is extending. Through this you can export new functions and other additions without running into a multiple-package mess.</p> <p>For a super small sample use of a module, have a look at <a href="https://github.com/Shinmera/modularize/blob/master/modularize-test-module.asd">modularize-test-module.asd</a> and <a href="https://github.com/Shinmera/modularize/blob/master/modularize-test-module.lisp">modularize-test-module.lisp</a>. For extensions to the module system, have a gander at <a href="https://github.com/Shinmera/modularize-interfaces">modularize-interfaces</a> and <a href="https://github.com/Shinmera/modularize-hooks">modularize-hooks</a>.</p> </div>  </article> <article id="copyright">  <h2>Copyright</h2> <span>modularize</span> is licensed under the <span><a href="https://tldrlegal.com/search?q=Artistic">Artistic</a></span> license.  © <span>Nicolas Hafner &lt;shinmera@tymoon.eu&gt;</span> .  This library can be obtained on <a href="https://github.com/Shinmera/modularize">https://github.com/Shinmera/modularize</a>.  </article>  <article id="symbol-index"> <h2>Package Index</h2> <ul><li class="package"> <h3> <a name="MODULARIZE" href="#MODULARIZE">MODULARIZE</a> <span class="nicknames">(RADIANCE-MODULARIZE ORG.SHIRAKUMO.RADIANCE.LIB.MODULARIZE)</span> </h3> <ul><li> <a name="MODULARIZE:MODULE"> </a> <article> <header class="class"> <span class="type">class</span>  <h4 class="name"><code><a href="#MODULARIZE:MODULE">MODULE</a></code></h4>  </header> <pre class="docstring">ASDF System subclass that serves as the class for virtual modules.</pre> </article> </li><li> <a name="MODULARIZE:MODULE-NOT-FOUND"> </a> <article> <header class="condition"> <span class="type">condition</span>  <h4 class="name"><code><a href="#MODULARIZE:MODULE-NOT-FOUND">MODULE-NOT-FOUND</a></code></h4>  </header> <pre class="docstring">Condition raised when a module is requested but not found.</pre> </article> </li><li> <a name="MODULARIZE:NOT-A-MODULE"> </a> <article> <header class="condition"> <span class="type">condition</span>  <h4 class="name"><code><a href="#MODULARIZE:NOT-A-MODULE">NOT-A-MODULE</a></code></h4>  </header> <pre class="docstring">Condition raised when a module is requested but only a package of the requested name exists.</pre> </article> </li><li> <a name="MODULARIZE:VIRTUAL-MODULE-NOT-FOUND"> </a> <article> <header class="condition"> <span class="type">condition</span>  <h4 class="name"><code><a href="#MODULARIZE:VIRTUAL-MODULE-NOT-FOUND">VIRTUAL-MODULE-NOT-FOUND</a></code></h4>  </header> <pre class="docstring">Condition raised when a virtual module was requested but could not be found.</pre> </article> </li><li> <a name="MODULARIZE:DELETE-HOOK"> </a> <article> <header class="accessor"> <span class="type">accessor</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:DELETE-HOOK">DELETE-HOOK</a></code></h4> <code class="qualifiers"></code> <code class="arguments">IDENTIFIER</code><code>)</code>  </header> <pre class="docstring">Returns the deletion hook function associated with the identifier or NIL.</pre> </article> </li><li> <a name="MODULARIZE:MODULARIZE-HOOK"> </a> <article> <header class="accessor"> <span class="type">accessor</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:MODULARIZE-HOOK">MODULARIZE-HOOK</a></code></h4> <code class="qualifiers"></code> <code class="arguments">IDENTIFIER</code><code>)</code>  </header> <pre class="docstring">Returns the modularization hook function associated with the identifier or NIL.</pre> </article> </li><li> <a name="MODULARIZE:MODULE-STORAGE"> </a> <article> <header class="accessor"> <span class="type">accessor</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:MODULE-STORAGE">MODULE-STORAGE</a></code></h4> <code class="qualifiers"></code> <code class="arguments">MODULE &amp;OPTIONAL (KEY NIL K-S)</code><code>)</code>  </header> <pre class="docstring">Returns the module storage table of the module or a field from it if a key is passed.</pre> </article> </li><li> <a name="MODULARIZE:VIRTUAL-MODULE"> </a> <article> <header class="accessor"> <span class="type">accessor</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:VIRTUAL-MODULE">VIRTUAL-MODULE</a></code></h4> <code class="qualifiers"></code> <code class="arguments">IDENTIFIER</code><code>)</code>  </header> <pre class="docstring">Returns the virtual module instance associated with the identifier if one was found, otherwise NIL.</pre> </article> </li><li> <a name="MODULARIZE:VIRTUAL-MODULE-NAME"> </a> <article> <header class="accessor"> <span class="type">accessor</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:VIRTUAL-MODULE-NAME">VIRTUAL-MODULE-NAME</a></code></h4> <code class="qualifiers"></code> <code class="arguments">OBJECT</code><code>)</code>  </header> <pre class="docstring"/> </article> </li><li> <a name="MODULARIZE:CALL-DELETE-HOOKS"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:CALL-DELETE-HOOKS">CALL-DELETE-HOOKS</a></code></h4> <code class="qualifiers"></code> <code class="arguments">PACKAGE</code><code>)</code>  </header> <pre class="docstring">Calls all deletion hooks on the package.</pre> </article> </li><li> <a name="MODULARIZE:CALL-MODULARIZE-HOOKS"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:CALL-MODULARIZE-HOOKS">CALL-MODULARIZE-HOOKS</a></code></h4> <code class="qualifiers"></code> <code class="arguments">PACKAGE</code><code>)</code>  </header> <pre class="docstring">Calls all modularization hooks on the package.</pre> </article> </li><li> <a name="MODULARIZE:DELETE-MODULE"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:DELETE-MODULE">DELETE-MODULE</a></code></h4> <code class="qualifiers"></code> <code class="arguments">MODULE</code><code>)</code>  </header> <pre class="docstring">Attempts to completely delete the given module.
 
 This first calls the delete hooks, then demodularizes the package,
  unbinds all symbols in the package from values and functions, and
-finally deletes the package.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:DEMODULARIZE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:DEMODULARIZE">DEMODULARIZE</a></h4>
-                      <span></span>
-                      <span>(MODULE)</span>
-                    </code>
-                  </header>
-                  <pre>Removes the module from the module storage table, essentially
+finally deletes the package.</pre> </article> </li><li> <a name="MODULARIZE:DEMODULARIZE"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:DEMODULARIZE">DEMODULARIZE</a></code></h4> <code class="qualifiers"></code> <code class="arguments">MODULE</code><code>)</code>  </header> <pre class="docstring">Removes the module from the module storage table, essentially
 returning it back to a normal package. Any additional effects by
 module options or modularization hooks can of course not be undone
-by this.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:LOAD-MODULE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:LOAD-MODULE">LOAD-MODULE</a></h4>
-                      <span></span>
-                      <span>(IDENTIFIER)</span>
-                    </code>
-                  </header>
-                  <pre>Attempts to find the module named by identifier and load its ASDF system.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:MAP-MODULES"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:MAP-MODULES">MAP-MODULES</a></h4>
-                      <span></span>
-                      <span>(FUNCTION)</span>
-                    </code>
-                  </header>
-                  <pre>Calls the function once with each module in no particular order.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:MODULARIZE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:MODULARIZE">MODULARIZE</a></h4>
-                      <span></span>
-                      <span>(&amp;KEY (PACKAGE *PACKAGE*) (NAME (PACKAGE-NAME PACKAGE)))</span>
-                    </code>
-                  </header>
-                  <pre>Turns the given package into one that is identified as a module.
+by this.</pre> </article> </li><li> <a name="MODULARIZE:LIST-MODULES"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:LIST-MODULES">LIST-MODULES</a></code></h4> <code class="qualifiers"></code> <code class="arguments"></code><code>)</code>  </header> <pre class="docstring">Returns a list of all modules in no particular order.</pre> </article> </li><li> <a name="MODULARIZE:LOAD-MODULE"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:LOAD-MODULE">LOAD-MODULE</a></code></h4> <code class="qualifiers"></code> <code class="arguments">IDENTIFIER</code><code>)</code>  </header> <pre class="docstring">Attempts to find the module named by identifier and load its ASDF system.</pre> </article> </li><li> <a name="MODULARIZE:MAP-MODULES"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:MAP-MODULES">MAP-MODULES</a></code></h4> <code class="qualifiers"></code> <code class="arguments">FUNCTION</code><code>)</code>  </header> <pre class="docstring">Calls the function once with each module in no particular order.</pre> </article> </li><li> <a name="MODULARIZE:MODULARIZE"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:MODULARIZE">MODULARIZE</a></code></h4> <code class="qualifiers"></code> <code class="arguments">&amp;KEY (PACKAGE *PACKAGE*) (NAME (PACKAGE-NAME PACKAGE))</code><code>)</code>  </header> <pre class="docstring">Turns the given package into one that is identified as a module.
 
 What this does is register the package on the module storage table,
-add the name and identifiers to it, and then call the modularize hooks.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:MODULARIZE-HOOK"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:MODULARIZE-HOOK">MODULARIZE-HOOK</a></h4>
-                      <span></span>
-                      <span>(IDENTIFIER)</span>
-                    </code>
-                  </header>
-                  <pre>Returns the modularization hook function associated with the identifier or NIL.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:MODULE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:MODULE">MODULE</a></h4>
-                      <span></span>
-                      <span>(&amp;OPTIONAL IDENTIFIER)</span>
-                    </code>
-                  </header>
-                  <pre>Attempts to return the matching module package.
+add the name and identifiers to it, and then call the modularize hooks.</pre> </article> </li><li> <a name="MODULARIZE:MODULE"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:MODULE">MODULE</a></code></h4> <code class="qualifiers"></code> <code class="arguments">&amp;OPTIONAL IDENTIFIER</code><code>)</code>  </header> <pre class="docstring">Attempts to return the matching module package.
 If not possible, a condition of type MODULE-NOT-FOUND is raised.
 
 You may pass a STRING, SYMBOL or PACKAGE as the identifier.
-If NIL is passed, the current *PACKAGE* is used instead.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:MODULE-IDENTIFIER"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:MODULE-IDENTIFIER">MODULE-IDENTIFIER</a></h4>
-                      <span></span>
-                      <span>(MODULE)</span>
-                    </code>
-                  </header>
-                  <pre>Returns the identifier of the module.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:MODULE-NAME"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:MODULE-NAME">MODULE-NAME</a></h4>
-                      <span></span>
-                      <span>(MODULE)</span>
-                    </code>
-                  </header>
-                  <pre>Returns the name of the module.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:MODULE-P"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:MODULE-P">MODULE-P</a></h4>
-                      <span></span>
-                      <span>(OBJECT)</span>
-                    </code>
-                  </header>
-                  <pre>Returns T if the passed object is or resolves to a module package, otherwise NIL.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:MODULE-STORAGE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:MODULE-STORAGE">MODULE-STORAGE</a></h4>
-                      <span></span>
-                      <span>(MODULE &amp;OPTIONAL (KEY NIL K-S))</span>
-                    </code>
-                  </header>
-                  <pre>Returns the module storage table of the module or a field from it if a key is passed.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:MODULE-STORAGE-REMOVE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:MODULE-STORAGE-REMOVE">MODULE-STORAGE-REMOVE</a></h4>
-                      <span></span>
-                      <span>(MODULE KEY)</span>
-                    </code>
-                  </header>
-                  <pre>Removes a key from the module storage table.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:REGISTER-VIRTUAL-MODULE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:REGISTER-VIRTUAL-MODULE">REGISTER-VIRTUAL-MODULE</a></h4>
-                      <span></span>
-                      <span>(MODULE)</span>
-                    </code>
-                  </header>
-                  <pre>Registers the given module in the virtual module map.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:REMOVE-DELETE-HOOK"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:REMOVE-DELETE-HOOK">REMOVE-DELETE-HOOK</a></h4>
-                      <span></span>
-                      <span>(IDENTIFIER)</span>
-                    </code>
-                  </header>
-                  <pre>Removes the deletion hook named by the identifier.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:REMOVE-MODULARIZE-HOOK"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:REMOVE-MODULARIZE-HOOK">REMOVE-MODULARIZE-HOOK</a></h4>
-                      <span></span>
-                      <span>(IDENTIFIER)</span>
-                    </code>
-                  </header>
-                  <pre>Removes the modularization hook named by the identifier.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:REMOVE-VIRTUAL-MODULE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:REMOVE-VIRTUAL-MODULE">REMOVE-VIRTUAL-MODULE</a></h4>
-                      <span></span>
-                      <span>(IDENTIFIER)</span>
-                    </code>
-                  </header>
-                  <pre>Removes the association of the name with a virtual module.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:VIRTUAL-MODULE"/>
-                <article>
-                  <header>
-                    <span>FUNCTION</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:VIRTUAL-MODULE">VIRTUAL-MODULE</a></h4>
-                      <span></span>
-                      <span>(IDENTIFIER)</span>
-                    </code>
-                  </header>
-                  <pre>Returns the virtual module instance associated with the identifier if one was found, otherwise NIL.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:EXPAND-OPTION"/>
-                <article>
-                  <header>
-                    <span>GENERIC</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:EXPAND-OPTION">EXPAND-OPTION</a></h4>
-                      <span></span>
-                      <span>(TYPE PACKAGE ARGS)</span>
-                    </code>
-                  </header>
-                  <pre>Called to expand module options into forms.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:VIRTUAL-MODULE-NAME"/>
-                <article>
-                  <header>
-                    <span>GENERIC</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:VIRTUAL-MODULE-NAME">VIRTUAL-MODULE-NAME</a></h4>
-                      <span></span>
-                      <span>(OBJECT)</span>
-                    </code>
-                  </header>
-                  <pre></pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:CURRENT-MODULE"/>
-                <article>
-                  <header>
-                    <span>MACRO</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:CURRENT-MODULE">CURRENT-MODULE</a></h4>
-                      <span></span>
-                      <span></span>
-                    </code>
-                  </header>
-                  <pre>Macro that expands to the module in the current package.
-Useful to establish a module context.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:DEFINE-DELETE-HOOK"/>
-                <article>
-                  <header>
-                    <span>MACRO</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:DEFINE-DELETE-HOOK">DEFINE-DELETE-HOOK</a></h4>
-                      <span></span>
-                      <span>((MODULEVAR &amp;OPTIONAL IDENTIFIER) &amp;BODY BODY)</span>
-                    </code>
-                  </header>
-                  <pre>Defines a new deletion hook. 
-The identifier is defaulted to a keyword representation of the current package name.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:DEFINE-MODULARIZE-HOOK"/>
-                <article>
-                  <header>
-                    <span>MACRO</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:DEFINE-MODULARIZE-HOOK">DEFINE-MODULARIZE-HOOK</a></h4>
-                      <span></span>
-                      <span>((MODULEVAR &amp;OPTIONAL IDENTIFIER) &amp;BODY BODY)</span>
-                    </code>
-                  </header>
-                  <pre>Defines a new modularization hook. 
-The identifier is defaulted to a keyword representation of the current package name.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:DEFINE-MODULE"/>
-                <article>
-                  <header>
-                    <span>MACRO</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:DEFINE-MODULE">DEFINE-MODULE</a></h4>
-                      <span></span>
-                      <span>(NAME &amp;BODY OPTIONS)</span>
-                    </code>
-                  </header>
-                  <pre>Defines a new module.
+If NIL is passed, the current *PACKAGE* is used instead.</pre> </article> </li><li> <a name="MODULARIZE:MODULE-IDENTIFIER"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:MODULE-IDENTIFIER">MODULE-IDENTIFIER</a></code></h4> <code class="qualifiers"></code> <code class="arguments">MODULE</code><code>)</code>  </header> <pre class="docstring">Returns the identifier of the module.</pre> </article> </li><li> <a name="MODULARIZE:MODULE-NAME"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:MODULE-NAME">MODULE-NAME</a></code></h4> <code class="qualifiers"></code> <code class="arguments">MODULE</code><code>)</code>  </header> <pre class="docstring">Returns the name of the module.</pre> </article> </li><li> <a name="MODULARIZE:MODULE-P"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:MODULE-P">MODULE-P</a></code></h4> <code class="qualifiers"></code> <code class="arguments">OBJECT</code><code>)</code>  </header> <pre class="docstring">Returns T if the passed object is or resolves to a module package, otherwise NIL.</pre> </article> </li><li> <a name="MODULARIZE:MODULE-STORAGE-REMOVE"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:MODULE-STORAGE-REMOVE">MODULE-STORAGE-REMOVE</a></code></h4> <code class="qualifiers"></code> <code class="arguments">MODULE KEY</code><code>)</code>  </header> <pre class="docstring">Removes a key from the module storage table.</pre> </article> </li><li> <a name="MODULARIZE:REGISTER-VIRTUAL-MODULE"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:REGISTER-VIRTUAL-MODULE">REGISTER-VIRTUAL-MODULE</a></code></h4> <code class="qualifiers"></code> <code class="arguments">MODULE</code><code>)</code>  </header> <pre class="docstring">Registers the given module in the virtual module map.</pre> </article> </li><li> <a name="MODULARIZE:REMOVE-DELETE-HOOK"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:REMOVE-DELETE-HOOK">REMOVE-DELETE-HOOK</a></code></h4> <code class="qualifiers"></code> <code class="arguments">IDENTIFIER</code><code>)</code>  </header> <pre class="docstring">Removes the deletion hook named by the identifier.</pre> </article> </li><li> <a name="MODULARIZE:REMOVE-MODULARIZE-HOOK"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:REMOVE-MODULARIZE-HOOK">REMOVE-MODULARIZE-HOOK</a></code></h4> <code class="qualifiers"></code> <code class="arguments">IDENTIFIER</code><code>)</code>  </header> <pre class="docstring">Removes the modularization hook named by the identifier.</pre> </article> </li><li> <a name="MODULARIZE:REMOVE-VIRTUAL-MODULE"> </a> <article> <header class="function"> <span class="type">function</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:REMOVE-VIRTUAL-MODULE">REMOVE-VIRTUAL-MODULE</a></code></h4> <code class="qualifiers"></code> <code class="arguments">IDENTIFIER</code><code>)</code>  </header> <pre class="docstring">Removes the association of the name with a virtual module.</pre> </article> </li><li> <a name="MODULARIZE:EXPAND-OPTION"> </a> <article> <header class="generic"> <span class="type">generic</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:EXPAND-OPTION">EXPAND-OPTION</a></code></h4> <code class="qualifiers"></code> <code class="arguments">TYPE PACKAGE ARGS</code><code>)</code>  </header> <pre class="docstring">Called to expand module options into forms.</pre> </article> </li><li> <a name="MODULARIZE:CURRENT-MODULE"> </a> <article> <header class="macro"> <span class="type">macro</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:CURRENT-MODULE">CURRENT-MODULE</a></code></h4> <code class="qualifiers"></code> <code class="arguments">&amp;REST ARGS</code><code>)</code>  </header> <pre class="docstring">Macro that expands to the module in the current package.
+Useful to establish a module context.</pre> </article> </li><li> <a name="MODULARIZE:DEFINE-DELETE-HOOK"> </a> <article> <header class="macro"> <span class="type">macro</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:DEFINE-DELETE-HOOK">DEFINE-DELETE-HOOK</a></code></h4> <code class="qualifiers"></code> <code class="arguments">&amp;REST ARGS</code><code>)</code>  </header> <pre class="docstring">Defines a new deletion hook. 
+The identifier is defaulted to a keyword representation of the current package name.</pre> </article> </li><li> <a name="MODULARIZE:DEFINE-MODULARIZE-HOOK"> </a> <article> <header class="macro"> <span class="type">macro</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:DEFINE-MODULARIZE-HOOK">DEFINE-MODULARIZE-HOOK</a></code></h4> <code class="qualifiers"></code> <code class="arguments">&amp;REST ARGS</code><code>)</code>  </header> <pre class="docstring">Defines a new modularization hook. 
+The identifier is defaulted to a keyword representation of the current package name.</pre> </article> </li><li> <a name="MODULARIZE:DEFINE-MODULE"> </a> <article> <header class="macro"> <span class="type">macro</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:DEFINE-MODULE">DEFINE-MODULE</a></code></h4> <code class="qualifiers"></code> <code class="arguments">&amp;REST ARGS</code><code>)</code>  </header> <pre class="docstring">Defines a new module.
 
 This essentially defines a new package with the given name,
 calls MODULARIZE on it and then expands all options to extend
-the package/module.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:DEFINE-MODULE-EXTENSION"/>
-                <article>
-                  <header>
-                    <span>MACRO</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:DEFINE-MODULE-EXTENSION">DEFINE-MODULE-EXTENSION</a></h4>
-                      <span></span>
-                      <span>((MODULE NAME) &amp;BODY OPTIONS)</span>
-                    </code>
-                  </header>
-                  <pre>Defines a module extension.
+the package/module.</pre> </article> </li><li> <a name="MODULARIZE:DEFINE-MODULE-EXTENSION"> </a> <article> <header class="macro"> <span class="type">macro</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:DEFINE-MODULE-EXTENSION">DEFINE-MODULE-EXTENSION</a></code></h4> <code class="qualifiers"></code> <code class="arguments">&amp;REST ARGS</code><code>)</code>  </header> <pre class="docstring">Defines a module extension.
 
 This gives the existing module new nicknames and expands the
-given options on it to add functionality.</pre>
-                </article>
-              </li><li>
-                <a name="MODULARIZE:DEFINE-OPTION-EXPANDER"/>
-                <article>
-                  <header>
-                    <span>MACRO</span>
-                    <code>
-                      <h4><a href="#MODULARIZE:DEFINE-OPTION-EXPANDER">DEFINE-OPTION-EXPANDER</a></h4>
-                      <span></span>
-                      <span>(NAME (PACKAGE &amp;REST ARGUMENTS) &amp;BODY BODY)</span>
-                    </code>
-                  </header>
-                  <pre>Defines a new option expander that is called whenever the option is used in the module definition.
-This should expand to forms that can be used in the module definition. Note that all expansions happen
-AFTER the modularize call, so you can use the module storage in your expansions.</pre>
-                </article>
-              </li></ul></li></ul></article></div></body></html>
+given options on it to add functionality.</pre> </article> </li><li> <a name="MODULARIZE:DEFINE-OPTION-EXPANDER"> </a> <article> <header class="macro"> <span class="type">macro</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:DEFINE-OPTION-EXPANDER">DEFINE-OPTION-EXPANDER</a></code></h4> <code class="qualifiers"></code> <code class="arguments">&amp;REST ARGS</code><code>)</code>  </header> <pre class="docstring">Defines a new option expander that is called whenever the option is used in the module definition.
+This should run whatever is necessary to accomplish the desired option effect. The expanders are run
+AFTER the modularize call, so you can use the module storage in your expansions.</pre> </article> </li><li> <a name="MODULARIZE:WITH-MODULE"> </a> <article> <header class="macro"> <span class="type">macro</span>  <code>(</code><h4 class="name"><code><a href="#MODULARIZE:WITH-MODULE">WITH-MODULE</a></code></h4> <code class="qualifiers"></code> <code class="arguments">&amp;REST ARGS</code><code>)</code>  </header> <pre class="docstring">Binds the resolved MODULE to VAR.</pre> </article> </li></ul> </li></ul> </article>  </main> </body> </html> 
