@@ -52,7 +52,7 @@
   (or (virtual-module (first args))
       (error 'virtual-module-not-found :requested (first args))))
 
-(defmethod asdf:operate :around ((op asdf:load-op) (module module) &key)
+(defmethod asdf:perform :around ((op asdf:load-op) (module module) &key)
   "Binds the package to *MODULARIZE-USER* so define-module can be used directly within the file definition."
   (let ((*package* (find-package "MODULARIZE-USER")))
     (call-next-method)))
