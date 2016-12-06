@@ -7,7 +7,7 @@ How To
 Each module should consist of a `DEFINE-MODULE` form and an ASDF system with the superclass `MODULARIZE:MODULE`. `DEFINE-MODULE` acts as a wrapper around `DEFPACKAGE`, so it will replace your usual `DEFPACKAGE` form. Any option you would use in `DEFPACKAGE` is also usable in `DEFINE-MODULE`, but the latter also allows for custom-defined options that perform specific actions upon module creation.
 
 ```
-(define-module test-module
+(modularize:define-module test-module
   (:use #:cl #:modularize)
   (:export #:greet))
 ```
@@ -22,7 +22,7 @@ If for some reason you absolutely do not want to use `DEFINE-MODULE`, you may de
   ...)
 ```
 
-When loading a module-system, `*PACKAGE*` is automatically bound to `MODULARIZE-USER` so that you may use `DEFINE-MODULE` without having to switch to a specific package first. It might still be a good idea to precede your `DEFINE-MODULE` form with an `(in-package #:modularize-user)` though. The main difference over packages is that each module has a central storage table, which you can access with `MODULE-STORAGE`. This allows you to save metadata on modules to keep track of the different parts each module might play in your application.
+The main difference over packages is that each module has a central storage table, which you can access with `MODULE-STORAGE`. This allows you to save metadata on modules to keep track of the different parts each module might play in your application.
 
 Another function that might prove useful is `DELETE-MODULE`, which attempts to offer a mechanism to completely remove a module so as to revert its changes. Without any further additions, this will simply result in all symbols in the module package being `MAKUNBOUND` and `FMAKUNBOUND` and the package getting deleted. Since a module might also cause changes outside of its own package, it is therefore advised to add deletion hooks through `DEFINE-DELETE-HOOK` as to make sure other kinds of changes can be cleaned up as well.
 

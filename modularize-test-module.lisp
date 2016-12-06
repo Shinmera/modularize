@@ -4,7 +4,7 @@
  Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
-(define-module modularize-test-module
+(modularize:define-module modularize-test-module
   (:use #:cl #:modularize)
   (:export #:greet))
 

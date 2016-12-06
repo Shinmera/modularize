@@ -10,7 +10,7 @@
 
 (defsystem modularize
   :name "Modularize"
-  :version "0.3.1"
+  :version "0.4.0"
   :license "Artistic"
   :author "Nicolas Hafner <shinmera@tymoon.eu>"
   :maintainer "Nicolas Hafner <shinmera@tymoon.eu>"
