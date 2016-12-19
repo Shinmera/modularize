@@ -38,6 +38,7 @@
    #:module-storage-remove
    #:module-identifier
    #:module-name
+   #:module-packages
    #:current-module
    #:define-option-expander
    #:expand-option

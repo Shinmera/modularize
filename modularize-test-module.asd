@@ -9,7 +9,7 @@
 (in-package :org.tymoonnext.radiance.lib.modularize.test-module.asdf)
 
 (defsystem modularize-test-module
-  :class "modularize:module"
+  :class "modularize:virtual-module"
   :components ((:file "modularize-test-module"))
   :defsystem-depends-on (:modularize)
   :version "1.0.0"

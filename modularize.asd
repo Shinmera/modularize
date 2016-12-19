@@ -10,7 +10,7 @@
 
 (defsystem modularize
   :name "Modularize"
-  :version "0.4.0"
+  :version "1.0.0"
   :license "Artistic"
   :author "Nicolas Hafner <shinmera@tymoon.eu>"
   :maintainer "Nicolas Hafner <shinmera@tymoon.eu>"
@@ -22,5 +22,6 @@
                (:file "hooks")
                (:file "module")
                (:file "options")
-               (:file "asdf"))
-  :depends-on ())
+               (:file "asdf")
+               (:file "documentation"))
+  :depends-on (:documentation-utils))

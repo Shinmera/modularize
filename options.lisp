@@ -34,3 +34,6 @@
 (define-option-expander size (package n)
   (declare (ignore n))
   (error "SIZE option not applicable."))
+
+(define-option-expander packages (module &rest names)
+  (setf (module-packages module) names))
