@@ -4,10 +4,6 @@
  Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
-(defpackage org.tymoonnext.radiance.lib.modularize.asdf
-  (:use #:cl #:asdf))
-(in-package :org.tymoonnext.radiance.lib.modularize.asdf)
-
 (defsystem modularize
   :name "Modularize"
   :version "1.0.0"

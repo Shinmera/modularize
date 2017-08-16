@@ -4,10 +4,6 @@
  Author: Nicolas Hafner <shinmera@tymoon.eu>
 |#
 
-(defpackage org.tymoonnext.radiance.lib.modularize.test-module.asdf
-  (:use #:cl #:asdf))
-(in-package :org.tymoonnext.radiance.lib.modularize.test-module.asdf)
-
 (defsystem modularize-test-module
   :class "modularize:virtual-module"
   :components ((:file "modularize-test-module"))
