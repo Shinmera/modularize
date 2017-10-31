@@ -8,14 +8,23 @@
 
 (defvar *virtual-module-map* (make-hash-table :test 'equal))
 
-(defun virtual-module (identifier)
+(defmethod virtual-module (identifier)
   (gethash (string identifier) *virtual-module-map*))
 
-(defun (setf virtual-module) (module identifier)
+(defmethod virtual-module ((identifier package))
+  (virtual-module (module-name identifier)))
+
+(defmethod (setf virtual-module) (module identifier)
   (setf (gethash (string identifier) *virtual-module-map*) module))
 
-(defun remove-virtual-module (identifier)
+(defmethod (setf virtual-module) (module (identifier package))
+  (setf (virtual-module (module-name identifier)) module))
+
+(defmethod remove-virtual-module (identifier)
   (remhash identifier *virtual-module-map*))
+
+(defmethod remove-virtual-module ((identifier package))
+  (remove-virtual-module (module-name identifier)))
 
 (define-condition virtual-module-not-found (error)
   ((%requested :initarg :requested :initform (error "REQUESTED required.") :reader requested))
