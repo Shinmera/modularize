@@ -11,7 +11,9 @@
   :author "Nicolas Hafner <shinmera@tymoon.eu>"
   :maintainer "Nicolas Hafner <shinmera@tymoon.eu>"
   :description "A modularization framework"
-  :homepage "https://github.com/Shinmera/modularize"
+  :homepage "https://Shinmera.github.io/modularize/"
+  :bug-tracker "https://github.com/Shinmera/modularize/issues"
+  :source-control (:git "https://github.com/Shinmera/modularize.git")
   :serial T
   :components ((:file "package")
                (:file "package-toolkit")
