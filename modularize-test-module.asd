@@ -9,7 +9,7 @@
   :components ((:file "modularize-test-module"))
   :defsystem-depends-on (:modularize)
   :version "1.0.0"
-  :license "Artistic"
+  :license "zlib"
   :author "Nicolas Hafner <shinmera@tymoon.eu>"
   :maintainer "Nicolas Hafner <shinmera@tymoon.eu>"
   :description "Test module system for modularize.")
