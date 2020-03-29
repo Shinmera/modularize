@@ -35,5 +35,9 @@
   (declare (ignore n))
   (error "SIZE option not applicable."))
 
+(define-option-expander local-nicknames (package &rest nicknames)
+  (loop for (nickname name) in nicknames
+        do (trivial-package-local-nicknames:add-package-local-nickname nickname name package)))
+
 (define-option-expander packages (module &rest names)
   (setf (module-packages module) names))

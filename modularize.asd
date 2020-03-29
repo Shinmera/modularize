@@ -22,4 +22,5 @@
                (:file "options")
                (:file "asdf")
                (:file "documentation"))
-  :depends-on (:documentation-utils))
+  :depends-on (:documentation-utils
+               :trivial-package-local-nicknames))

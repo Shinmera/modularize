@@ -50,6 +50,9 @@
                 (export args package))
                (:intern
                 (loop for symbol in args do (intern (symbol-name symbol) package)))
+               (:local-nicknames
+                (loop for (nickname name) in args
+                      do (trivial-package-local-nicknames:add-package-local-nickname nickname name package)))
                (:size
                 (error "SIZE option not applicable to EXTEND-PACKAGE."))))))
 
