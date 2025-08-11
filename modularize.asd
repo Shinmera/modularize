@@ -5,9 +5,9 @@
   :author "Yukari Hafner <shinmera@tymoon.eu>"
   :maintainer "Yukari Hafner <shinmera@tymoon.eu>"
   :description "A modularization framework"
-  :homepage "https://Shinmera.github.io/modularize/"
-  :bug-tracker "https://github.com/Shinmera/modularize/issues"
-  :source-control (:git "https://github.com/Shinmera/modularize.git")
+  :homepage "https://shinmera.com/docs/modularize/"
+  :bug-tracker "https://shinmera.com/project/modularize/issues"
+  :source-control (:git "https://shinmera.com/project/modularize.git")
   :serial T
   :components ((:file "package")
                (:file "package-toolkit")
